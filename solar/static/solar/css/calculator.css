@@ -1,0 +1,133 @@
+/* ═══════════════════════════════════════════════
+   calculator.css — Steps, Resultado e Badges
+   PI Energia Solar
+   ═══════════════════════════════════════════════ */
+
+/* ── Steps ────────────────────────────────────── */
+.steps {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.step.active { color: var(--accent); }
+
+.step-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
+}
+
+.step.active .step-dot {
+  background: var(--sun);
+  border-color: var(--sun);
+  color: var(--sky);
+}
+
+.step-sep {
+  color: var(--border);
+  font-size: 0.9rem;
+}
+
+/* ── Área de resultado ────────────────────────── */
+#resultado {
+  display: none;
+  margin-top: 2rem;
+}
+
+#resultado.show {
+  animation: fadeUp 0.4s ease forwards;
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Grid de cards de resultado ───────────────── */
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 480px) {
+  .result-grid { grid-template-columns: 1fr; }
+}
+
+.result-item {
+  background: var(--sky-mid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.1rem 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.result-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.result-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.result-value.green { color: var(--green); }
+
+.result-sub {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* ── Badges de viabilidade ────────────────────── */
+.viab-badge {
+  padding: 0.4rem 1.1rem;
+  border-radius: 999px;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.viab-sim {
+  background: rgba(46, 204, 113, 0.18);
+  color: #2ECC71;
+  border: 1px solid #2ECC7144;
+}
+
+.viab-nao {
+  background: rgba(231, 76, 60, 0.18);
+  color: #E74C3C;
+  border: 1px solid #E74C3C44;
+}

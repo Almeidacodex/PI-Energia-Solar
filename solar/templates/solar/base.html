@@ -1,0 +1,34 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Solar Calc ☀️{% endblock %}</title>
+
+  <!-- Fontes -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <!-- CSS global -->
+  <link rel="stylesheet" href="{% static 'solar/css/base.css' %}"/>
+  <link rel="stylesheet" href="{% static 'solar/css/components.css' %}"/>
+
+  <!-- CSS extra por página -->
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<header>
+  <div class="logo-sun"></div>
+  <div class="logo-text">Solar<span>Calc</span></div>
+</header>
+
+{% block content %}{% endblock %}
+
+<footer>☀️ PI Energia Solar · Projeto Integrador Acadêmico</footer>
+
+<!-- JS extra por página -->
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

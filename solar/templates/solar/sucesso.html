@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Orçamento Enviado · Solar Calc</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+
+:root {
+  --sun: #F5A623;
+  --accent: #FFC94A;
+  --sky: #0A1628;
+  --sky-mid: #112240;
+  --sky-card: #162845;
+  --text: #EAF0FB;
+  --muted: #8899BB;
+  --border: rgba(245,166,35,0.18);
+  --green: #2ECC71;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--sky);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  overflow: hidden;
+}
+
+/* Partículas de fundo */
+.bg-glow {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 700px; height: 700px;
+  background: radial-gradient(ellipse, rgba(245,166,35,0.12) 0%, transparent 65%);
+  pointer-events: none;
+  animation: breathe 4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,100% { transform: translate(-50%,-50%) scale(1); }
+  50%      { transform: translate(-50%,-50%) scale(1.12); }
+}
+
+header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  z-index: 10;
+}
+
+.logo-sun {
+  width: 36px; height: 36px;
+  background: radial-gradient(circle, #FFD966 30%, var(--sun) 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(245,166,35,0.5);
+  animation: pulse-sun 3s ease-in-out infinite;
+}
+
+@keyframes pulse-sun {
+  0%,100% { box-shadow: 0 0 20px rgba(245,166,35,0.5); }
+  50%      { box-shadow: 0 0 38px rgba(245,166,35,0.85); }
+}
+
+.logo-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+.logo-text span { color: var(--muted); font-weight: 400; }
+
+/* Main content */
+.content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 520px;
+  animation: fadeUp .6s ease forwards;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Ícone de sucesso */
+.success-icon {
+  width: 96px; height: 96px;
+  background: radial-gradient(circle, #2ECC7130 0%, transparent 70%);
+  border: 2px solid rgba(46, 204, 113, 0.35);
+  border-radius: 50%;
+  margin: 0 auto 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pop .5s cubic-bezier(.34,1.56,.64,1) .2s both;
+}
+
+@keyframes pop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.success-icon svg { animation: draw-check .5s ease .5s both; }
+
+@keyframes draw-check {
+  from { stroke-dashoffset: 50; }
+  to   { stroke-dashoffset: 0; }
+}
+
+.success-icon svg path { stroke-dasharray: 50; }
+
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -.8px;
+  color: #fff;
+  margin-bottom: .8rem;
+  line-height: 1.1;
+}
+
+h1 em {
+  font-style: normal;
+  background: linear-gradient(90deg, #F5A623, #FFD966);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+}
+
+/* Cards de info */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .9rem;
+  margin-bottom: 2.5rem;
+  text-align: left;
+}
+
+@media (max-width: 400px) { .info-grid { grid-template-columns: 1fr; } }
+
+.info-card {
+  background: var(--sky-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  animation: fadeUp .4s ease both;
+}
+
+.info-card:nth-child(1) { animation-delay: .1s; }
+.info-card:nth-child(2) { animation-delay: .2s; }
+.info-card:nth-child(3) { animation-delay: .3s; }
+.info-card:nth-child(4) { animation-delay: .4s; }
+
+.info-label {
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.info-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* Próximos passos */
+.steps-card {
+  background: var(--sky-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.4rem 1.6rem;
+  text-align: left;
+  margin-bottom: 2rem;
+  animation: fadeUp .4s .5s ease both;
+}
+
+.steps-title {
+  font-family: 'Syne', sans-serif;
+  font-size: .9rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.next-step {
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+  padding: .6rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.next-step:last-child { border-bottom: none; }
+
+.step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(245,166,35,.15);
+  border: 1.5px solid rgba(245,166,35,.3);
+  color: var(--sun);
+  font-family: 'Syne', sans-serif;
+  font-size: .75rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.step-text {
+  font-size: .88rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.step-text small { display: block; color: var(--muted); font-size: .78rem; margin-top: .1rem; }
+
+/* Botões */
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: .7rem;
+  animation: fadeUp .4s .6s ease both;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  border-radius: 12px;
+  font-family: 'Syne', sans-serif;
+  font-size: .95rem;
+  font-weight: 700;
+  padding: .82rem 1.6rem;
+  text-decoration: none;
+  transition: transform .15s, box-shadow .2s;
+  cursor: pointer;
+  border: none;
+}
+
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--sun), var(--accent));
+  color: var(--sky);
+  box-shadow: 0 4px 20px rgba(245,166,35,.25);
+}
+
+.btn-primary:hover { box-shadow: 0 8px 30px rgba(245,166,35,.4); }
+
+.btn-ghost {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--muted);
+}
+
+.btn-ghost:hover { border-color: var(--sun); color: var(--sun); }
+
+footer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  text-align: center;
+  padding: 1rem;
+  color: var(--muted);
+  font-size: .78rem;
+  z-index: 10;
+}
+
+
+  </style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<header>
+  <div class="logo-sun"></div>
+  <div class="logo-text">Solar<span>Calc</span></div>
+</header>
+
+<div class="content">
+
+  <div class="success-icon">
+    <svg width="44" height="44" viewBox="0 0 24 24" fill="none">
+      <path stroke="#2ECC71" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+            d="M5 13l4 4L19 7"/>
+    </svg>
+  </div>
+
+  <h1>Orçamento<br/>registrado <em>com sucesso!</em></h1>
+
+  <p class="subtitle">
+    Seus dados e o resultado do cálculo foram salvos.<br/>
+    Um especialista entrará em contato em breve.
+  </p>
+    <div class="info-grid">
+  <div class="info-card">
+    <div class="info-label">Potência necessária</div>
+    <div class="info-value">{{ calculo.potencia_kwp }} kWp</div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-label">Custo estimado</div>
+    <div class="info-value">
+      R$ {{ calculo.custo_estimado }}
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-label">Economia mensal</div>
+    <div class="info-value">
+      R$ {{ calculo.economia_mensal }}
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-label">Payback estimado</div>
+    <div class="info-value">
+      {{ calculo.payback_anos }} anos
+    </div>
+  </div>
+</div>
+
+
+  <div class="steps-card">
+    <div class="steps-title">📋 Próximos passos</div>
+
+
+<div class="next-step">
+  <div class="step-num">1</div>
+  <div class="step-text">
+    Análise técnica do seu perfil
+    <small>Nossa equipe revisará o cálculo gerado</small>
+  </div>
+</div>
+
+<div class="next-step">
+  <div class="step-num">2</div>
+  <div class="step-text">
+    Contato por e-mail ou telefone
+    <small>Enviaremos uma proposta detalhada</small>
+  </div>
+</div>
+
+<div class="next-step">
+  <div class="step-num">3</div>
+  <div class="step-text">
+    Instalação e monitoramento
+    <small>Acompanhe a economia na sua conta de luz</small>
+  </div>
+</div>
+
+
+  </div>
+
+  <div class="btn-group">
+    <a href="/" class="btn btn-primary">
+      <svg width="17" height="17" fill="none" viewBox="0 0 24 24">
+        <path stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      </svg>
+      Fazer novo cálculo
+    </a>
+      {% if request.session.orcamento_id %}        ← ADICIONAR AQUI
+    <a href="{% url 'download_pdf' request.session.orcamento_id %}"
+       class="btn btn-ghost">
+        Baixar PDF do orçamento ↓
+    </a>
+    {% endif %}
+
+    <a href="/admin/" class="btn btn-ghost">
+        Ver painel administrativo →
+    </a>
+
+
+
+  </div>
+
+</div>
+
+<footer>☀️ PI Energia Solar · Projeto Integrador Acadêmico</footer>
+
+</body>
+</html>
