@@ -67,7 +67,9 @@ def calcular(request):
     # - Paga em até 7 anos  → ótimo
     # - Paga em até 12 anos → razoável
     # - Mais de 12 anos     → não compensa (vida útil média do sistema é 25 anos)
-    compensa = payback_final <= 12
+    compensa = payback_final <= 8
+
+
 
     request.session['ultimo_calculo'] = {
         'consumo_kwh': consumo,
@@ -85,8 +87,8 @@ def calcular(request):
         'payback': payback_final,
         'compensa': compensa,
         'classificacao': (
-            'otimo' if payback_final <= 7 else
-            'razoavel' if payback_final <= 12 else
+            'otimo' if payback_final <= 5 else
+            'razoavel' if payback_final <= 8 else
             'nao_compensa'
         ),
     })
