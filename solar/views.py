@@ -2,10 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-from io import BytesIO
-
+from weasyprint import HTML
+from django.views.decorators.csrf import csrf_exempt
 from decimal import Decimal, ROUND_HALF_UP
 import json
 from .models import Cliente, Orcamento
@@ -18,6 +16,8 @@ def calculadora(request):
 
 
 
+
+@csrf_exempt
 def calcular(request):
     if request.method != 'POST':
         return JsonResponse({'erro': 'Método não permitido'}, status=405)
@@ -67,9 +67,7 @@ def calcular(request):
     # - Paga em até 7 anos  → ótimo
     # - Paga em até 12 anos → razoável
     # - Mais de 12 anos     → não compensa (vida útil média do sistema é 25 anos)
-    compensa = payback_final <= 8
-
-
+    compensa = payback_final <= 12
 
     request.session['ultimo_calculo'] = {
         'consumo_kwh': consumo,
@@ -87,8 +85,8 @@ def calcular(request):
         'payback': payback_final,
         'compensa': compensa,
         'classificacao': (
-            'otimo' if payback_final <= 5 else
-            'razoavel' if payback_final <= 8 else
+            'otimo' if payback_final <= 7 else
+            'razoavel' if payback_final <= 12 else
             'nao_compensa'
         ),
     })
@@ -137,4 +135,3 @@ def  download_pdf(request, orcamento_id):
     response     =HttpResponse(pdf,content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename={orcamento_id}.pdf'
     return response
-# deploy fix
