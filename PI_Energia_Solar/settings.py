@@ -11,6 +11,13 @@ ALLOWED_HOSTS = [
     'web-production-55226.up.railway.app',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://web-production-55226.up.railway.app',
+]
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
 # ─── Apps instalados ──────────────────────────────────────────────────────────
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -101,3 +108,4 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 #EMAIL_HOST_USER     = config('EMAIL_HOST_USER',default ='')
 #EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD',default ='')
 #DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
