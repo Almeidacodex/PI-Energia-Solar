@@ -9,20 +9,16 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'web-production-55226.up.railway.app',
-    'pi-energia-solar.onrender.com',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://web-production-55226.up.railway.app',
-    'https://pi-energia-solar.onrender.com',
 ]
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# ─── Apps instalados ──────────────────────────────────────────────────────────
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -32,17 +28,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'solar.apps.SolarConfig',
     'usuarios.apps.UsuariosConfig',
-
-    # 'calculadora' removido — app vazia, adicione de volta quando implementar
 ]
 
-# Diz ao Django para usar o seu model, não o padrão
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
-# ─── Middleware ───────────────────────────────────────────────────────────────
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # logo após SecurityMiddleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -70,7 +62,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'PI_Energia_Solar.wsgi.application'
 
-# ─── Banco de dados ───────────────────────────────────────────────────────────
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -78,7 +69,6 @@ DATABASES = {
     }
 }
 
-# ─── Senhas ───────────────────────────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -86,30 +76,22 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# ─── Internacionalização ──────────────────────────────────────────────────────
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE     = 'America/Sao_Paulo'
 USE_I18N      = True
 USE_TZ        = True
 
-# ─── Arquivos estáticos ───────────────────────────────────────────────────────
 STATIC_URL  = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# ─── Chave padrão de PK ───────────────────────────────────────────────────────
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ── Email ─────────────────────────────────────────────────────────────────────
-
-
-
-# Produção (Gmail):
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-#EMAIL_HOST          = 'smtp.gmail.com'
-#EMAIL_PORT          = 587
-#EMAIL_USE_TLS       = True
-#EMAIL_HOST_USER     = config('EMAIL_HOST_USER',default ='')
-#EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD',default ='')
-#DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
+EMAIL_BACKEND       = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST          = 'smtp.gmail.com'
+EMAIL_PORT          = 587
+EMAIL_USE_TLS       = True
+EMAIL_HOST_USER     = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL  = EMAIL_HOST_USER

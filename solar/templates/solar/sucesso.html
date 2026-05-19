@@ -32,7 +32,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  overflow: hidden;
+  overflow-y: auto;  /* ← era hidden, agora scroll funciona */
 }
 
 /* Partículas de fundo */
@@ -389,24 +389,16 @@ footer {
       </svg>
       Fazer novo cálculo
     </a>
-      {% if orcamento_id %}        
-    <a href="{% url 'download_pdf' orcamento_id %}"
-        class="btn btn-ghost">
+    {% if orcamento_id %}
+    <a href="{% url 'download_pdf' orcamento_id %}" class="btn btn-ghost">
         Baixar PDF do orçamento ↓
     </a>
     {% endif %}
-
-    <a href="/admin/" class="btn btn-ghost">
-        Ver painel administrativo →
-    </a>
-
-
-
-  </div>
+</div>
 
 </div>
 
 <footer>☀️ PI Energia Solar · Projeto Integrador Acadêmico</footer>
 
 </body>
-</html>
+</htm
