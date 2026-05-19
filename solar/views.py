@@ -7,12 +7,13 @@ import json
 from .models import Cliente, Orcamento
 from .forms import ClienteForm
 from django.core.mail import send_mail
+from django.views.decorators.csrf import csrf_exempt
 
 
 def calculadora(request):
     return render(request, 'solar/index.html')
 
-
+@csrf_exempt
 def calcular(request):
     if request.method != 'POST':
         return JsonResponse({'erro': 'Método não permitido'}, status=405)
