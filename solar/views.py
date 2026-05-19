@@ -41,9 +41,14 @@ def calcular(request):
         return JsonResponse(
             {'erro': 'Consumo deve ser maior que zero'},
             status=400)
-    if tarifa < 0 or irradiacao < 0:
+    if tarifa > 5.0:
         return JsonResponse(
-            {'erro': 'Tarifa e irradiação devem ser maiores que zero.'},
+            {'erro': 'Tarifa inválida. O valor máximo é R$ 5,00/kWh.'},
+            status=400
+        )
+    if tarifa > 5.0:
+        return JsonResponse(
+            {'erro': 'Tarifa inválida. O valor máximo é R$ 5,00/kWh.'},
             status=400
         )
 
