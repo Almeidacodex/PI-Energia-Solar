@@ -2,7 +2,10 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.http import HttpResponse
-from weasyprint import HTML
+#from weasyprint import HTML
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from io import BytesIO
 from django.views.decorators.csrf import csrf_exempt
 from decimal import Decimal, ROUND_HALF_UP
 import json
