@@ -389,9 +389,9 @@ footer {
       </svg>
       Fazer novo cálculo
     </a>
-      {% if request.session.orcamento_id %}        ← ADICIONAR AQUI
-    <a href="{% url 'download_pdf' request.session.orcamento_id %}"
-       class="btn btn-ghost">
+      {% if orcamento_id %}        
+    <a href="{% url 'download_pdf' orcamento_id %}"
+        class="btn btn-ghost">
         Baixar PDF do orçamento ↓
     </a>
     {% endif %}

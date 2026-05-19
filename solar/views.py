@@ -1,13 +1,8 @@
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
-from django.template.loader import render_to_string
-from django.http import HttpResponse
-#from weasyprint import HTML
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse, HttpResponse
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from io import BytesIO
-from django.views.decorators.csrf import csrf_exempt
-from decimal import Decimal, ROUND_HALF_UP
 import json
 from .models import Cliente, Orcamento
 from .forms import ClienteForm
@@ -18,9 +13,6 @@ def calculadora(request):
     return render(request, 'solar/index.html')
 
 
-
-
-@csrf_exempt
 def calcular(request):
     if request.method != 'POST':
         return JsonResponse({'erro': 'Método não permitido'}, status=405)
@@ -30,27 +22,19 @@ def calcular(request):
     except json.JSONDecodeError:
         return JsonResponse({'erro': 'JSON inválido'}, status=400)
 
-    consumo = float(dados.get('consumo', 0))
-    conta = float(dados.get('conta', 0))
-    tarifa = float(dados.get('tarifa', 0.85))
+    consumo    = float(dados.get('consumo', 0))
+    conta      = float(dados.get('conta', 0))
+    tarifa     = float(dados.get('tarifa', 0.85))
     irradiacao = float(dados.get('irradiacao', 5.0))
-    geracao = float(dados.get('geracao', 100)) / 100
-    reajuste = float(dados.get('reajuste', 8)) / 100
+    geracao    = float(dados.get('geracao', 100)) / 100
+    reajuste   = float(dados.get('reajuste', 8)) / 100
 
     if consumo <= 0:
-        return JsonResponse(
-            {'erro': 'Consumo deve ser maior que zero'},
-            status=400)
-    if tarifa > 5.0:
-        return JsonResponse(
-            {'erro': 'Tarifa inválida. O valor máximo é R$ 5,00/kWh.'},
-            status=400
-        )
-    if tarifa > 5.0:
-        return JsonResponse(
-            {'erro': 'Tarifa inválida. O valor máximo é R$ 5,00/kWh.'},
-            status=400
-        )
+        return JsonResponse({'erro': 'Consumo deve ser maior que zero'}, status=400)
+    if tarifa <= 0 or tarifa > 5.0:
+        return JsonResponse({'erro': 'Tarifa inválida. Use um valor entre 0 e R$ 5,00/kWh.'}, status=400)
+    if irradiacao <= 0:
+        return JsonResponse({'erro': 'Irradiação deve ser maior que zero'}, status=400)
 
     consumo_alvo    = consumo * geracao
     potencia        = consumo_alvo / (irradiacao * 30 * 0.82)
@@ -59,45 +43,40 @@ def calcular(request):
     economia_anual  = economia_mensal * 12
 
     acumulado = 0
-    payback = None  # ← None em vez de 0
-    eco_ano = economia_anual
+    payback   = None
+    eco_ano   = economia_anual
 
-    for ano in range(1, 26):  # ← 25 anos é o padrão do setor
+    for ano in range(1, 26):
         acumulado += eco_ano
         if acumulado >= custo and payback is None:
             payback = ano
         eco_ano *= (1 + reajuste)
 
-    # Se não pagou em 25 anos, não compensa
     payback_final = payback if payback is not None else 99
 
-    # Regras de viabilidade mais realistas:
-    # - Paga em até 7 anos  → ótimo
-    # - Paga em até 12 anos → razoável
-    # - Mais de 12 anos     → não compensa (vida útil média do sistema é 25 anos)
-    compensa = payback_final <= 12
-
     request.session['ultimo_calculo'] = {
-        'consumo_kwh': consumo,
-        'conta_valor': conta,
-        'potencia_kwp': round(potencia, 2),
-        'custo_estimado': round(custo, 2),
+        'consumo_kwh':     consumo,
+        'conta_valor':     conta,
+        'potencia_kwp':    round(potencia, 2),
+        'custo_estimado':  round(custo, 2),
         'economia_mensal': round(economia_mensal, 2),
-        'payback_anos': payback_final,
+        'payback_anos':    payback_final,
     }
+    request.session.modified = True
 
     return JsonResponse({
-        'potencia': round(potencia, 2),
-        'custo': round(custo, 2),
+        'potencia':        round(potencia, 2),
+        'custo':           round(custo, 2),
         'economia_mensal': round(economia_mensal, 2),
-        'payback': payback_final,
-        'compensa': compensa,
+        'payback':         payback_final,
+        'compensa':        payback_final <= 8,
         'classificacao': (
-            'otimo' if payback_final <= 7 else
-            'razoavel' if payback_final <= 12 else
+            'otimo'       if payback_final <= 5 else
+            'razoavel'    if payback_final <= 8 else
             'nao_compensa'
         ),
     })
+
 
 def cadastro(request):
     if request.method == 'POST':
@@ -106,8 +85,9 @@ def cadastro(request):
             cliente = form.save()
             calculo = request.session.get('ultimo_calculo', {})
             if calculo:
-                orc =  Orcamento.objects.create(cliente=cliente, **calculo)
+                orc = Orcamento.objects.create(cliente=cliente, **calculo)
                 request.session['orcamento_id'] = orc.id
+                request.session.modified = True
 
             send_mail(
                 subject='☀ Seu orçamento solar foi recebido!',
@@ -122,7 +102,7 @@ def cadastro(request):
                 ),
                 from_email=None,
                 recipient_list=[cliente.email],
-                fail_silently=False,  # nunca derrubar o fluxo por email
+                fail_silently=True,
             )
             return redirect('sucesso')
     else:
@@ -132,14 +112,48 @@ def cadastro(request):
 
 def sucesso(request):
     calculo = request.session.get('ultimo_calculo')
-    if not  calculo:
-       return redirect('calculadora')
-    return render(request, 'solar/sucesso.html', {'calculo': calculo})
+    if not calculo:
+        return redirect('calculadora')
+    orcamento_id = request.session.get('orcamento_id')
+    return render(request, 'solar/sucesso.html', {
+        'calculo': calculo,
+        'orcamento_id': orcamento_id,
+    })
 
-def  download_pdf(request, orcamento_id):
-    orcamento    = Orcamento.objects.select_related('cliente').get(id = orcamento_id)
-    html_str     = render_to_string('solar/orcamento_pdf.html', {'orcamento': orcamento})
-    pdf          =HTML(string=html_str).write_pdf()
-    response     =HttpResponse(pdf,content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename={orcamento_id}.pdf'
+
+def download_pdf(request, orcamento_id):
+    orcamento = get_object_or_404(Orcamento.objects.select_related('cliente'), id=orcamento_id)
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer, pagesize=A4)
+    largura, altura = A4
+
+    p.setFont("Helvetica-Bold", 20)
+    p.drawString(50, altura - 80, "Orcamento Solar")
+    p.setFont("Helvetica", 12)
+    p.drawString(50, altura - 120, f"Cliente: {orcamento.cliente.nome}")
+    p.drawString(50, altura - 140, f"Email:   {orcamento.cliente.email}")
+    p.line(50, altura - 160, largura - 50, altura - 160)
+
+    dados = [
+        ("Potencia necessaria", f"{orcamento.potencia_kwp} kWp"),
+        ("Custo estimado",      f"R$ {orcamento.custo_estimado}"),
+        ("Economia mensal",     f"R$ {orcamento.economia_mensal}"),
+        ("Payback estimado",    f"{orcamento.payback_anos} anos"),
+    ]
+    y = altura - 200
+    for label, valor in dados:
+        p.setFont("Helvetica-Bold", 11)
+        p.drawString(50, y, f"{label}:")
+        p.setFont("Helvetica", 11)
+        p.drawString(220, y, valor)
+        y -= 28
+
+    p.setFont("Helvetica", 9)
+    p.setFillColorRGB(0.5, 0.5, 0.5)
+    p.drawCentredString(largura / 2, 40, "PI Energia Solar — gerado automaticamente")
+    p.showPage()
+    p.save()
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="orcamento_{orcamento_id}.pdf"'
     return response
