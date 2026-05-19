@@ -102,7 +102,7 @@ def cadastro(request):
                 ),
                 from_email=None,
                 recipient_list=[cliente.email],
-                fail_silently=False
+                fail_silently=True
             )
             return redirect('sucesso')
     else:
