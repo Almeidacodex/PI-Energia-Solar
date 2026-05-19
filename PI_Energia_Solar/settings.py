@@ -1,18 +1,11 @@
+import os
 from pathlib import Path
-from decouple import config
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config('SECRET_KEY')
-
-DEBUG = config('DEBUG', cast=bool, default=False)
-
-ALLOWED_HOSTS = config(
-    'ALLOWED_HOSTS',
-    default='localhost,127.0.0.1',
-    cast=lambda v: [s.strip() for s in v.split(',')]
-)
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-chave-local-apenas')
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # ─── Apps instalados ──────────────────────────────────────────────────────────
 INSTALLED_APPS = [
