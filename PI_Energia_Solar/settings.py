@@ -9,10 +9,12 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'web-production-55226.up.railway.app',
+    'pi-energia-solar.onrender.com',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://web-production-55226.up.railway.app',
+    'https://pi-energia-solar.onrender.com',
 ]
 
 CSRF_COOKIE_SECURE = True
