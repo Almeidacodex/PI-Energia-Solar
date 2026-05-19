@@ -16,7 +16,7 @@ UF_CHOICES = [
 
 class Cliente(models.Model):
     nome      = models.CharField(max_length=100, verbose_name="Nome completo")
-    email     = models.EmailField(unique=True, verbose_name="E-mail")
+    email = models.EmailField(verbose_name="E-mail")
     telefone  = models.CharField(max_length=20, verbose_name="Telefone")
     cidade    = models.CharField(max_length=100, verbose_name="Cidade")
     estado    = models.CharField(max_length=2, choices=UF_CHOICES,
